@@ -1,6 +1,7 @@
 #from eulerian_magnify import eulerian_magnification, show_frequencies
 #from pulse import get_pulse
 #from pulse1 import get_pulse
+from eulerian import eulerian_laplacian
 import pickle
 from eulerian import eulerian_magnification, get_pulse1, show_pulse, get_pulse, get_pulse2
 from pulse import compte_pulse
@@ -47,10 +48,15 @@ import time
 
 #video = eulerian_magnification('media/face.mp4', 0.5, 0.75, image_processing='gaussian', pyramid_levels=3, freq_min=50.0 / 60.0, freq_max=1.0, amplification=50)
 
+#frame1, larg, haut = eulerian_laplacian(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.5, freq_max=3.5, amplification=150)
 
 
 
-video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.5, freq_max=3.5, amplification=150)
+video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.801, freq_max=1.334, amplification=150)
+
+
+
+
 
 
 listex, listey = mainc(frame1, larg, haut)

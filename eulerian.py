@@ -6,6 +6,12 @@ import numpy
 import pylab
 import scipy.signal
 import scipy.fftpack
+import scipy.misc
+
+import PIL
+from PIL import Image
+
+
 
 import cv2.cv as cv
 
@@ -21,12 +27,15 @@ def eulerian_magnification(video_filename, pour_larg, pour_haut, image_processin
         vid_data = gaussian_video(orig_vid, pyramid_levels)
         print vid_data.shape
     elif image_processing == 'laplacian':
-        vid_data = laplacian_video(orig_vid, pyramid_levels)
+        vid_data = laplacian_video(orig_vid, pyramid_levels, haut, larg)
     vid_data = temporal_bandpass_filter(vid_data, fps, freq_min=freq_min, freq_max=freq_max)
     print "Amplifying signal by factor of " + str(amplification)
     vid_data *= amplification
+    print "ampliOK"
     file_name = os.path.splitext(path_to_video)[0]
+    print "LOK"
     file_name = file_name + "_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
+    print "VID"
     video = combine_pyramid_and_save(vid_data, orig_vid, pyramid_levels, fps, save_filename=file_name + '_magnified.mp4')
 #    debut_larg = int(pour_larg*larg)
 #    debut_haut = int(pour_haut*haut)
@@ -38,7 +47,19 @@ def eulerian_magnification(video_filename, pour_larg, pour_haut, image_processin
     frame = 'media/test1.png'
     return video, frame, larg, haut
 
-
+def eulerian_laplacian(video_filename, pour_larg, pour_haut, image_processing='gaussian', freq_min=0.833, freq_max=1, amplification=50, pyramid_levels=4):
+    """Amplify subtle variation in a video and save it to disk"""
+    path_to_video = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), video_filename)
+    orig_vid, fps, larg, haut, frame1 = load_video(path_to_video)
+    lapl = laplacian_image(frame1, pyramid_levels)
+#    width, height = get_capture_dimensions(lapl)
+#    fact_largeur = larg/width
+#    fact_hauteur = haut/height
+#    frame2 = cv2.res
+    lapl1 = scipy.misc.imresize(lapl,(haut,larg),'bilinear',None)
+    cv2.imwrite('media/test2.png', lapl1)
+    frame = 'media/test2.png'
+    return frame, larg, haut
 
 
 
@@ -173,7 +194,7 @@ def gaussian_video(video, shrink_multiple):
     return vid_data
 
 
-def laplacian_video(video, shrink_multiple):
+def laplacian_video(video, shrink_multiple, haut, larg):
     vid_data = None
     for x in range(0, video.shape[0]):
         frame = video[x]
@@ -184,10 +205,20 @@ def laplacian_video(video, shrink_multiple):
             gauss_copy = cv2.pyrDown(gauss_copy)
 
         laplacian = prev_copy - cv2.pyrUp(gauss_copy)
+        lapl1 = scipy.misc.imresize(laplacian,(haut,larg),'bilinear',None)
         if x == 0:
-            vid_data = numpy.zeros((video.shape[0], laplacian.shape[0], laplacian.shape[1], 3))
-        vid_data[x] = laplacian
+            vid_data = numpy.zeros((video.shape[0], lapl1.shape[0], lapl1.shape[1], 3))
+        vid_data[x] = lapl1
     return vid_data
+
+def laplacian_image(frame, shrink_multiple):
+    gauss_copy = numpy.ndarray(shape=frame.shape, dtype="float")
+    gauss_copy[:] = frame
+    for i in range(shrink_multiple):
+        prev_copy = gauss_copy[:]
+        gauss_copy = cv2.pyrDown(gauss_copy)
+    laplacian = prev_copy - cv2.pyrUp(gauss_copy)
+    return laplacian
 
 
 def combine_pyramid_and_save(g_video, orig_video, enlarge_multiple, fps, save_filename='media/output.mp4'):
