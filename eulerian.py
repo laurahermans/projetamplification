@@ -29,13 +29,14 @@ def eulerian_magnification(video_filename, pour_larg, pour_haut, image_processin
     elif image_processing == 'laplacian':
         vid_data = laplacian_video(orig_vid, pyramid_levels, haut, larg)
     vid_data = temporal_bandpass_filter(vid_data, fps, freq_min=freq_min, freq_max=freq_max)
-    print "Amplifying signal by factor of " + str(amplification)
-    vid_data *= amplification
-    print "ampliOK"
+#    print "Amplifying signal by factor of " + str(amplification)
+#    print "v1"
+#    print vid_data.shape
+#    vid_data *= amplification
+#    print "v2"
+#    print vid_data.shape
     file_name = os.path.splitext(path_to_video)[0]
-    print "LOK"
     file_name = file_name + "_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
-    print "VID"
     video = combine_pyramid_and_save(vid_data, orig_vid, pyramid_levels, fps, save_filename=file_name + '_magnified.mp4')
 #    debut_larg = int(pour_larg*larg)
 #    debut_haut = int(pour_haut*haut)
@@ -222,7 +223,9 @@ def laplacian_image(frame, shrink_multiple):
 
 
 def combine_pyramid_and_save(g_video, orig_video, enlarge_multiple, fps, save_filename='media/output.mp4'):
-    """Combine a gaussian video representation with the original and save to file"""
+    """Combine a gaussian video representation with the original and save to file
+    :rtype : object
+    """
     width, height = get_frame_dimensions(orig_video[0])
     fourcc = cv.CV_FOURCC('m', 'p', '4', 'v')
 #    writer = cv2.VideoWriter(save_filename, fourcc, fps, (width, height), 1)
@@ -232,10 +235,14 @@ def combine_pyramid_and_save(g_video, orig_video, enlarge_multiple, fps, save_fi
     print writer.open(save_filename, fourcc, fps, (width, height), True)
     for x in range(0, g_video.shape[0]):
         img = numpy.ndarray(shape=g_video[x].shape, dtype='float')
-        img[:] = g_video[x].imag
-        for i in range(enlarge_multiple):
-            img = cv2.pyrUp(img)
-        img[:height, :width] = img[:height, :width] + orig_video[x]
+        img[:]=g_video[x].real
+#        img[:] = g_video[x].imag
+#        for i in range(enlarge_multiple):
+#            img = cv2.pyrUp(img)
+#        img[:height, :width] = img[:height, :width] + orig_video[x]
+
+#        img[:height, :width] = img[:height, :width]
+
 #        pulse.append(get_pixel(img[:]))
         video.append(img[:])
         res = cv2.convertScaleAbs(img[:height, :width])

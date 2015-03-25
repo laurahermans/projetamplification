@@ -5,9 +5,9 @@ from eulerian import eulerian_laplacian
 import pickle
 from eulerian import eulerian_magnification, get_pulse1, show_pulse, get_pulse, get_pulse2
 from pulse import compte_pulse
-from eulerian import  show_frequencies
+from eulerian import show_frequencies
 
-from clique import mainc
+#from clique import mainc
 
 
 import sys
@@ -52,10 +52,10 @@ import time
 
 
 
-video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.801, freq_max=1.334, amplification=150)
+video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.8026, freq_max=1.334, amplification=2)
 
 
-
+"""
 
 
 
@@ -88,3 +88,4 @@ print listex[0]
 pulse = get_pulse2(video,listex,listey)
 compte_pulse(pulse,29)
 show_pulse(pulse)
+"""
