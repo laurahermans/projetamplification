@@ -23,18 +23,21 @@ def eulerian_magnification(video_filename, pour_larg, pour_haut, image_processin
     orig_vid, fps, larg, haut, frame1 = load_video(path_to_video)
 #    print "fps = " + str(fps)
     pulse = []
+    origv = numpy.zeros((orig_vid.shape[0], haut/2, larg/2, 3), dtype='uint8')
+    for i in range(orig_vid.shape[0]):
+        origv[i,::] = scipy.misc.imresize(orig_vid[i,::],(haut/2,larg/2),'bilinear',None)
+
+    orig_vid = origv
     if image_processing == 'gaussian':
         vid_data = gaussian_video(orig_vid, pyramid_levels)
         print vid_data.shape
     elif image_processing == 'laplacian':
         vid_data = laplacian_video(orig_vid, pyramid_levels, haut, larg)
+
     vid_data = temporal_bandpass_filter(vid_data, fps, freq_min=freq_min, freq_max=freq_max)
 #    print "Amplifying signal by factor of " + str(amplification)
-#    print "v1"
-#    print vid_data.shape
-#    vid_data *= amplification
-#    print "v2"
-#    print vid_data.shape
+    vid_data *= amplification
+
     file_name = os.path.splitext(path_to_video)[0]
     file_name = file_name + "_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
     video = combine_pyramid_and_save(vid_data, orig_vid, pyramid_levels, fps, save_filename=file_name + '_magnified.mp4')
@@ -101,7 +104,10 @@ def show_frequencies(video_filename, bounds=None):
     original_video, fps, larg, haut, frame2 = load_video(video_filename)
     print fps
     averages = []
-
+    bounds =[135,220,0,haut]
+    pylab.figure()
+    pylab.imshow(original_video[0, bounds[2]:bounds[3], bounds[0]:bounds[1],:])
+    pylab.show()
     if bounds:
         for x in range(1, original_video.shape[0] - 1):
             averages.append(original_video[x, bounds[2]:bounds[3], bounds[0]:bounds[1], :].sum())
@@ -139,6 +145,28 @@ def temporal_bandpass_filter(data, fps, freq_min=0.833, freq_max=1.333, axis=0):
     fft[:bound_low] = 0
     fft[bound_high:-bound_high] = 0
     fft[-bound_low:] = 0
+#    print fft
+
+#    for i in range(fft.shape[0]):
+#        for j in range(fft.shape[1]):
+#            for k in range(fft.shape[2]):
+#                for l in range(fft.shape[3]):
+#                    if(fft[i,j,k,l]>bound_high or fft[i,j,k,l]<bound_low):
+#                        fft[i,j,k,l] = 0
+
+
+
+#    bp = fft[:]
+
+#    for i in range (len(bp)):
+#        print bp[i]
+#        if bp[i]>= bound_high:
+#            bp[i]=0
+#        if bp[i]<= bound_low:
+#            bp[i]=0
+#    print bp
+
+
     return scipy.fftpack.ifft(fft, axis=0)
 
 
@@ -236,6 +264,7 @@ def combine_pyramid_and_save(g_video, orig_video, enlarge_multiple, fps, save_fi
     for x in range(0, g_video.shape[0]):
         img = numpy.ndarray(shape=g_video[x].shape, dtype='float')
         img[:]=g_video[x].real
+
 #        img[:] = g_video[x].imag
 #        for i in range(enlarge_multiple):
 #            img = cv2.pyrUp(img)

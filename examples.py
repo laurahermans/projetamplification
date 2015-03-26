@@ -38,7 +38,7 @@ long=resultat.pourcentage_hauteur
 #show_frequencies('media/pap.mp4')
 #eulerian_magnification('media/face.mp4', image_processing='gaussian', pyramid_levels=3, freq_min=50.0 / 60.0, freq_max=1.0, amplification=50)
 
-#show_frequencies('media/baby.mp4')
+#show_frequencies('media/calib.mp4')
 #eulerian_magnification('media/face.mp4', image_processing='laplacian', pyramid_levels=5, freq_min=0.45, freq_max=1, amplification=50)
 
 #get_pulse('media/video.mp4',0.5,0.5)
@@ -52,7 +52,7 @@ import time
 
 
 
-video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=0.8026, freq_max=1.334, amplification=2)
+video, frame1, larg, haut = eulerian_magnification(nomvid, larg, long, image_processing='laplacian', pyramid_levels=3, freq_min=2.5, freq_max=3.5, amplification=0)
 
 
 """
